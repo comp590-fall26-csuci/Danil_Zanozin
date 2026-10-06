@@ -1,0 +1,53 @@
+name: Lab 4 CI - Fibonacci
+
+on:
+  push:
+    branches: [ "main", "lab*" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [ gcc, clang ]
+
+    name: Build & test (${{ matrix.compiler }})
+
+    defaults:
+      run:
+        working-directory: lab3
+
+    steps:
+      - name: Check out code and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Show compiler version
+        run: ${{ matrix.compiler }} --version
+
+      - name: Compile with make
+        run: |
+          make clean
+          make CC=${{ matrix.compiler }}
+
+      - name: Run the program
+        run: make -s run | tee actual.txt
+
+      - name: Check output matches expected
+        run: |
+          cat > expected.txt <<'OUT'
+          The 10th Fibonacci number is 55
+          The theoretical Golden Ratio is 1.618034
+          OUT
+          if diff -u expected.txt actual.txt; then
+            echo "Output is correct"
+          else
+            echo "Output does not match"
+            exit 1
+          fi
