@@ -1,0 +1,25 @@
+name: AFL++ dvcp
+
+on: [pull_request]
+
+jobs:
+  afl-fuzz:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fuzz dvcp for three minutes
+        env:
+          AFL_DONT_OPTIMIZE: "1"
+          AFL_SKIP_CPUFREQ: "1"
+          AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES: "1"
+          AFL_DISABLE_TRIM: "1"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y afl++
+          afl-clang-fast -O0 -g dvcp.c -o dvcp
+          mkdir -p seeds
+          head -c 27 /dev/zero > seeds/seed
+          afl-fuzz -i seeds -o findings -V 180 -t 1000 -m 128 -- ./dvcp @@
