@@ -2,7 +2,7 @@ name: Lab 4 CI - Fibonacci
 
 on:
   push:
-    branches: [ "main", "lab*" ]
+    branches: [ "main", "lab*", "Lab*" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
