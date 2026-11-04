@@ -1,0 +1,25 @@
+- name: Configure the lab 6 web server
+  hosts: local
+  become: true
+
+  tasks:
+    - name: check if asciinema is installed
+      ansible.builtin.apt:
+        name: asciinema
+        state: present
+        update_cache: true
+
+    - name: check if apache is installed
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+
+    - name: start apache at boot
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: true
+
+    - name: show completion message
+      ansible.builtin.debug:
+        msg: "apache is running at localhost"
