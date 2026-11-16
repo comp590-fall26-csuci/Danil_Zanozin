@@ -60,6 +60,9 @@ jobs:
           make clean
           make CC=${{ matrix.compiler }}
 
+      - name: Run all unit tests
+        run: make test
+
       - name: Run the program
         run: make -s run | tee actual.txt
 
